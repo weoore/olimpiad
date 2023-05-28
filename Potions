@@ -1,0 +1,60 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+class Program
+{
+    static void Main()
+    {
+        List<List<string>> data = new List<List<string>>();
+
+        using (StreamReader Inp = new StreamReader("Input.txt"))
+        {
+            string[] lines = Inp.ReadToEnd().Split('\n');
+            foreach (string line in lines)
+            {
+                string[] words = line.Split();
+                data.Add(new List<string>(words));
+            }
+        }
+
+        for (int i = 0; i < data.Count; i++)
+        {
+            if (data[i][0] == "MIX")
+            {
+                data[i][0] = "MX";
+                data[i].Add("XM");
+            }
+            else if (data[i][0] == "WATER")
+            {
+                data[i][0] = "WT";
+                data[i].Add("TW");
+            }
+            else if (data[i][0] == "DUST")
+            {
+                data[i][0] = "DT";
+                data[i].Add("TD");
+            }
+            else if (data[i][0] == "FIRE")
+            {
+                data[i][0] = "FR";
+                data[i].Add("RF");
+            }
+
+            for (int j = 0; j < data[i].Count; j++)
+            {
+                if (int.TryParse(data[i][j], out int index))
+                {
+                    data[i][j] = string.Join("", data[index - 1]);
+                }
+            }
+        }
+
+        string result = string.Join("", data[data.Count - 1]);
+
+        using (StreamWriter Outp = new StreamWriter("Output.txt"))
+        {
+            Outp.Write(result);
+        }
+    }
+}
