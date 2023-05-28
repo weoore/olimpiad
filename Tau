@@ -1,0 +1,38 @@
+using System;
+using System.IO;
+
+class Program
+{
+    static void Main()
+    {
+        string[] mass;
+
+        using (StreamReader reader = new StreamReader("Input.txt"))
+        {
+            mass = reader.ReadLine().Split();
+        }
+
+        string[] ans = new string[mass.Length];
+
+        int start = mass.Length / 2;
+        for (int I = 0; I < mass.Length; I++)
+        {
+            int dif = (I % 2 == 0) ? I : -I;
+            start += dif;
+
+            int innerStart = mass[start].Length / 2;
+            for (int i = 0; i < mass[start].Length; i++)
+            {
+                int innerDif = (i % 2 == 0) ? i : -i;
+                innerStart += innerDif;
+
+                ans[I] += mass[start][innerStart];
+            }
+        }
+
+        using (StreamWriter writer = new StreamWriter("Output.txt"))
+        {
+            writer.Write(string.Join(" ", ans));
+        }
+    }
+}
