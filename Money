@@ -1,0 +1,67 @@
+# olimpiadusing System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+class Program
+{
+    static void Main()
+    {
+        int[] C, A, D, B, E;
+
+        using (StreamReader Inp = new StreamReader("Input.txt"))
+        {
+            C = Inp.ReadLine().Split().Select(int.Parse).ToArray();
+            A = Inp.ReadLine().Split().Select(int.Parse).ToArray();
+            D = Inp.ReadLine().Split().Select(int.Parse).ToArray();
+            B = Inp.ReadLine().Split().Select(int.Parse).ToArray();
+            E = Inp.ReadLine().Split().Select(int.Parse).ToArray();
+
+            C = C.Concat(new int[] { 1, 1 }).ToArray();
+            A = new int[] { A[0] }.Concat(A.Skip(1).OrderByDescending(x => x)).ToArray();
+            D = D.Take(1).Concat(new int[] { 151863 }).Concat(D.Skip(1)).ToArray();
+            B = new int[] { B[0] }.Concat(B.Skip(1).OrderBy(x => x)).ToArray();
+        }
+
+        for (int e = 0; e < C[0]; e++)
+        {
+            for (int a = 0; a < A[0]; a++)
+            {
+                if (E[e] >= A[a + 1])
+                {
+                    E[e] -= 1;
+                }
+            }
+        }
+
+        int res = 0;
+        for (int i = C[0] - 1; i >= 0; i--)
+        {
+            C[i + 1] *= C[i + 2];
+            res += C[i + 1] * E[i];
+        }
+
+        int[] ans = new int[D[0]];
+        for (int i = D[0] - 1; i >= 0; i--)
+        {
+            ans[i] = res % D[i + 1];
+            res /= D[i + 1];
+        }
+
+        for (int s = 0; s < D[0]; s++)
+        {
+            for (int b = 0; b < B[0]; b++)
+            {
+                if (ans[s] >= B[b + 1])
+                {
+                    ans[s] += 1;
+                }
+            }
+        }
+
+        using (StreamWriter Outp = new StreamWriter("Output.txt"))
+        {
+            Outp.Write(string.Join(" ", ans));
+        }
+    }
+}
