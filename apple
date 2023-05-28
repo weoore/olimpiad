@@ -1,0 +1,107 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+class Program
+{
+    static void Main()
+    {
+        using (StreamReader Inp = new StreamReader("Input.txt"))
+        {
+            string[] firstLine = Inp.ReadLine().Split();
+            int N = int.Parse(firstLine[0]);
+            int M = int.Parse(firstLine[1]);
+
+            int[] C = new int[M];
+            int[] S = new int[M];
+
+            int[][] tree = new int[N + 1][];
+            for (int i = 0; i <= N; i++)
+            {
+                tree[i] = new int[N + 1];
+                for (int j = 0; j <= N; j++)
+                {
+                    if (i != j)
+                        tree[i][j] = int.MaxValue;
+                }
+            }
+
+            for (int i = 0; i < N; i++)
+            {
+                string[] line = Inp.ReadLine().Split();
+                int K = int.Parse(line[0]);
+                int L = int.Parse(line[1]);
+                tree[K][i + 1] = tree[i + 1][K] = L;
+            }
+
+            for (int j = 0; j < M; j++)
+            {
+                string[] line = Inp.ReadLine().Split();
+                C[j] = int.Parse(line[0]);
+                S[j] = int.Parse(line[1]);
+            }
+
+            string[] lastLine = Inp.ReadLine().Split();
+            int X = int.Parse(lastLine[0]);
+            int Z = int.Parse(lastLine[1]);
+
+            for (int k = 0; k <= N; k++)
+            {
+                for (int i = 0; i <= N; i++)
+                {
+                    for (int j = 0; j <= N; j++)
+                    {
+                        tree[i][j] = Math.Min(tree[i][k] + tree[k][j], tree[i][j]);
+                    }
+                }
+            }
+
+            List<int> removeIndices = new List<int>();
+            for (int x = 0; x < M; x++)
+            {
+                if (S[x] < Z)
+                    removeIndices.Add(x);
+            }
+
+            for (int i = removeIndices.Count - 1; i >= 0; i--)
+            {
+                int index = removeIndices[i];
+                C = RemoveAt(C, index);
+                S = RemoveAt(S, index);
+            }
+
+            int ans = 0;
+            while (C.Length > 0)
+            {
+                int minDistance = int.MaxValue;
+                int aim = -1;
+                for (int c = 0; c < C.Length; c++)
+                {
+                    if (tree[X][C[c]] < minDistance)
+                    {
+                        minDistance = tree[X][C[c]];
+                        aim = C[c];
+                    }
+                }
+                ans += minDistance;
+                X = aim;
+                C = RemoveAt(C, Array.IndexOf(C, aim));
+            }
+
+            using (StreamWriter Outp = new StreamWriter("Output.txt"))
+            {
+                Outp.Write(ans.ToString());
+            }
+        }
+    }
+
+    static T[] RemoveAt<T>(T[] source, int index)
+    {
+        T[] dest = new T[source.Length - 1];
+        if (index > 0)
+            Array.Copy(source, 0, dest, 0, index);
+        if (index < source.Length - 1)
+            Array.Copy(source, index + 1, dest, index, source.Length - index - 1);
+        return dest;
+    }
+}
