@@ -1,0 +1,93 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+class Program
+{
+    static void Main()
+    {
+        Dictionary<string, List<string>> employees = new Dictionary<string, List<string>>();
+        Dictionary<string, string> names = new Dictionary<string, string>();
+        Dictionary<string, string> nums = new Dictionary<string, string>();
+
+        using (StreamReader Inp = new StreamReader("Input.txt"))
+        {
+            string line;
+            int count = 0;
+            while ((line = Inp.ReadLine()) != "END")
+            {
+                if (count % 2 == 0)
+                {
+                    string boss = line.Trim();
+                    if (boss.Length != 4)
+                    {
+                        string[] bossParts = boss.Split(' ', 2);
+                        string bossCode = bossParts[0];
+                        string bossName = bossParts[1];
+                        names[bossCode] = bossName;
+                        nums[bossName] = bossCode;
+                    }
+                    if (!names.ContainsKey(boss))
+                    {
+                        names[boss] = "Unknown Name";
+                    }
+                }
+                else
+                {
+                    string sub = line.Trim();
+                    if (sub.Length != 4)
+                    {
+                        string[] subParts = sub.Split(' ', 2);
+                        string subCode = subParts[0];
+                        string subName = subParts[1];
+                        names[subCode] = subName;
+                    }
+                    if (!names.ContainsKey(sub))
+                    {
+                        names[sub] = "Unknown Name";
+                    }
+
+                    string boss = line;
+                    if (employees.ContainsKey(boss))
+                    {
+                        employees[boss].Add(sub);
+                    }
+                    else
+                    {
+                        employees[boss] = new List<string> { sub };
+                    }
+                }
+                count++;
+            }
+            string bossLine = Inp.ReadLine();
+            string[] BOSS = bossLine.All(char.IsDigit) ? new string[] { bossLine } : new string[] { nums[bossLine] };
+
+            List<string> ans = new List<string>();
+            while (BOSS.Length > 0)
+            {
+                List<string> res = new List<string>();
+                foreach (string t in BOSS)
+                {
+                    if (employees.ContainsKey(t))
+                    {
+                        ans.AddRange(employees[t]);
+                        res.AddRange(employees[t]);
+                    }
+                }
+                BOSS = res.ToArray();
+            }
+
+            ans = ans.Distinct().Select(n => $"{n} {names[n]}").OrderBy(n => n).ToList();
+            if (ans.Count == 0)
+            {
+                ans.Add("NO");
+            }
+
+            using (StreamWriter Outp = new StreamWriter("Output.txt"))
+            {
+                Outp.Write(string.Join("\n", ans));
+            }
+        }
+    }
+}
